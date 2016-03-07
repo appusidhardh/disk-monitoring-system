@@ -1,6 +1,10 @@
 #!/bin/bash
 thersholdPercentage=$1
 mailId=$2
+if { [ -z $thersholdPercentage ] || [ -z mailId ]; } then
+	echo "Pass the parameters. Exiting"
+	exit
+fi
 #this function checks for error $1 is the value returned by the 
 #command $3 is the message to print $2 decide whether to exit or not
 checkError()

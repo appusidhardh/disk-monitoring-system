@@ -1,6 +1,7 @@
 #!/bin/bash
-thesholdPercentage=$1
+thersholdPercentage=$1
 mailId=$2
+
 checkError()
 {
         returnValue=$1
@@ -43,24 +44,30 @@ do
 		diskFreepercentage=`sed "${diskCount}q;d" tempDiskinfo.txt | awk '{print $1}'|awk -F'%' '{print $1}'`
 		diskFreespace=`sed "${diskCount}q;d" tempDiskinfo.txt | awk '{print $4}'`
 		diskUsedspace=`sed "${diskCount}q;d" tempDiskinfo.txt | awk '{print $3}'`
+		
 		echo "Disk Name: $diskName" >> disk.log
 		echo "Use: $diskFreepercentage% Available: $diskFreespace Used: $diskUsedspace" >> disk.log
 		
-		if [ $thesholdPercentage -lt $diskFreepercentage ]; then
+		if [ $thersholdPercentage -lt $diskFreepercentage ]; then
 			time_stamp=`date`
 			echo "$time_stamp : Thershold broke for disk $diskName. Available disk Space is $diskFreespace">>disk.log 
 			echo "Thershold broke for disk $diskName on $time_stamp. Available disk Space is $diskFreespace" | mail -s "Disk problem detected" $mailId
+			
 		else
+			
 			echo "`date` : thershold is okay for disk $diskName">>disk.log
+			
 		fi
 		healtStatus=`smartctl -d ata -H $diskName | grep "test result" | awk -F ': ' '{print $2}'`
 		passed="PASSED"
 		if [ $healtStatus=$passed ]; then
+			
 			echo "$time_stamp : Overall healthscheck result for $diskName: Passed">>disk.log
+			
 		else
 			echo "$time_stamp : Overall healthcheck result for $diskName: failed" >>disk.log
 			echo "$time_stamp : Overall healthcheck result for $diskName: failed" | mail -s "Disk problem detected" $mailId
-
+			
 		fi
 		one=1
 		diskCount=$(( diskCount-one ))
